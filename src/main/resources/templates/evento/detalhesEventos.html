@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>EventoApp</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --teal: #0f9e8a;
+            --teal-light: #e6f7f5;
+            --teal-dark: #0a6e60;
+            --red: #c0392b;
+            --red-light: #fdf0ee;
+            --ink: #1a1a1a;
+            --ink-soft: #555;
+            --ink-muted: #999;
+            --border: #e8e8e8;
+            --surface: #fafafa;
+            --white: #ffffff;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--surface);
+            color: var(--ink);
+            min-height: 100vh;
+        }
+
+        /* TOP BAR */
+        .topbar {
+            background: var(--white);
+            border-bottom: 1px solid var(--border);
+            padding: 0 2rem;
+            height: 56px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .topbar-logo {
+            font-family: 'DM Serif Display', serif;
+            font-size: 20px;
+            color: var(--teal);
+            text-decoration: none;
+            letter-spacing: -0.5px;
+        }
+        .topbar-back {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--ink-soft);
+            text-decoration: none;
+            padding: 6px 14px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            transition: all 0.15s;
+        }
+        .topbar-back:hover { background: var(--surface); color: var(--ink); }
+
+        /* LAYOUT */
+        .page {
+            max-width: 860px;
+            margin: 0 auto;
+            padding: 2.5rem 1.5rem 4rem;
+        }
+
+        /* EVENT HERO */
+        .event-hero {
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 2rem 2.5rem;
+            margin-bottom: 1.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+        .event-hero::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--teal), #26c6b3);
+        }
+        .event-name {
+            font-family: 'DM Serif Display', serif;
+            font-size: 2rem;
+            color: var(--ink);
+            letter-spacing: -0.5px;
+            margin-bottom: 1.25rem;
+        }
+        .event-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .meta-icon {
+            width: 32px;
+            height: 32px;
+            background: var(--teal-light);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .meta-icon svg { width: 15px; height: 15px; fill: var(--teal); }
+        .meta-label { font-size: 11px; color: var(--ink-muted); display: block; line-height: 1; margin-bottom: 2px; }
+        .meta-value { font-size: 14px; font-weight: 500; color: var(--ink); line-height: 1; }
+
+        /* GRID */
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 1.5rem;
+            align-items: start;
+        }
+        @media (max-width: 640px) { .grid { grid-template-columns: 1fr; } }
+
+        /* CARD */
+        .card {
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            overflow: hidden;
+        }
+        .card-header {
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .card-title {
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--ink-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        /* FORM */
+        .form-body { padding: 1.5rem; display: flex; flex-direction: column; gap: 1rem; }
+        .field label {
+            display: block;
+            font-size: 11px;
+            font-weight: 500;
+            color: var(--ink-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.07em;
+            margin-bottom: 6px;
+        }
+        .field input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 14px;
+            color: var(--ink);
+            background: var(--white);
+            outline: none;
+            transition: border-color 0.15s;
+        }
+        .field input:focus { border-color: var(--teal); }
+        .btn-add {
+            width: 100%;
+            padding: 11px;
+            background: var(--teal);
+            color: white;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 14px;
+            font-weight: 500;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.15s;
+            margin-top: 4px;
+        }
+        .btn-add:hover { background: var(--teal-dark); }
+
+        /* TABLE */
+        .table-wrap { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; }
+        thead th {
+            padding: 10px 16px;
+            font-size: 11px;
+            font-weight: 500;
+            color: var(--ink-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.07em;
+            text-align: left;
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+        }
+        tbody tr { border-bottom: 1px solid var(--border); transition: background 0.1s; }
+        tbody tr:last-child { border-bottom: none; }
+        tbody tr:hover { background: var(--surface); }
+        tbody td { padding: 13px 16px; font-size: 14px; vertical-align: middle; }
+        .td-num { color: var(--ink-muted); font-size: 12px; width: 36px; }
+        .td-actions { text-align: right; white-space: nowrap; }
+        .guest-avatar {
+            width: 30px; height: 30px;
+            border-radius: 50%;
+            background: var(--teal-light);
+            color: var(--teal-dark);
+            font-size: 11px;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+            vertical-align: middle;
+            text-transform: uppercase;
+        }
+        .td-rg { font-family: monospace; font-size: 13px; color: var(--ink-soft); }
+        .badge-ok {
+            background: var(--teal-light);
+            color: var(--teal-dark);
+            font-size: 11px;
+            font-weight: 500;
+            padding: 3px 9px;
+            border-radius: 99px;
+        }
+        .empty-row td {
+            padding: 2.5rem;
+            text-align: center;
+            color: var(--ink-muted);
+            font-size: 14px;
+        }
+        .count-badge {
+            background: var(--teal-light);
+            color: var(--teal-dark);
+            font-size: 11px;
+            font-weight: 500;
+            padding: 3px 10px;
+            border-radius: 99px;
+        }
+        .btn-delete {
+            background: none;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 4px 10px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--red);
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        .btn-delete:hover {
+            background: var(--red-light);
+            border-color: var(--red);
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="topbar">
+        <a href="/eventos" class="topbar-logo">EventoApp</a>
+        <a href="/eventos" class="topbar-back">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+            Voltar aos eventos
+        </a>
+    </nav>
+
+    <main class="page">
+
+        <!-- EVENT HERO -->
+        <div class="event-hero">
+            <h1 class="event-name" th:text="${evento.nome}">Nome do Evento</h1>
+            <div class="event-meta">
+                <div class="meta-item">
+                    <div class="meta-icon">
+                        <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+                    </div>
+                    <div>
+                        <span class="meta-label">Local</span>
+                        <span class="meta-value" th:text="${evento.local}">—</span>
+                    </div>
+                </div>
+                <div class="meta-item">
+                    <div class="meta-icon">
+                        <svg viewBox="0 0 24 24"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/></svg>
+                    </div>
+                    <div>
+                        <span class="meta-label">Data</span>
+                        <span class="meta-value" th:text="${evento.data}">—</span>
+                    </div>
+                </div>
+                <div class="meta-item">
+                    <div class="meta-icon">
+                        <svg viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67V7z"/></svg>
+                    </div>
+                    <div>
+                        <span class="meta-label">Horário</span>
+                        <span class="meta-value" th:text="${evento.horario}">—</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid">
+
+            <!-- FORM CARD -->
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title">Adicionar convidado</span>
+                </div>
+                <form th:action="@{/{codigo}(codigo=${evento.codigo})}" method="post">
+                    <div class="form-body">
+                        <div class="field">
+                            <label for="nome">Nome</label>
+                            <input type="text" name="nome" id="nome" placeholder="Nome completo"/>
+                        </div>
+                        <div class="field">
+                            <label for="rg">RG</label>
+                            <input type="text" name="rg" id="rg" placeholder="00.000.000-0"/>
+                        </div>
+                        <button class="btn-add" type="submit">Adicionar</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- GUESTS TABLE CARD -->
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title">Lista de convidados</span>
+                    <span class="count-badge" th:text="${convidados != null ? convidados.size() : 0} + ' convidado(s)'">0 convidado(s)</span>
+                </div>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Nome</th>
+                                <th>RG</th>
+                                <th>Status</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="convidado, iterStat : ${convidados}">
+                                <td class="td-num" th:text="${iterStat.count}"></td>
+                                <td>
+                                    <span class="guest-avatar"
+                                          th:text="${#strings.substring(convidado.nomeConvidado, 0, 2)}">--</span>
+                                    <span th:text="${convidado.nomeConvidado}"></span>
+                                </td>
+                                <td class="td-rg" th:text="${convidado.rg}"></td>
+                                <td><span class="badge-ok">Confirmado</span></td>
+                                <td class="td-actions">
+                                    <form th:action="@{/{codigo}/convidados/{rg}/deletar(codigo=${evento.codigo}, rg=${convidado.rg})}"
+                                          method="post"
+                                          onsubmit="return confirm('Deseja remover este convidado?')">
+                                        <button class="btn-delete" type="submit">Remover</button>
+                                    </form>
+                                </td>
+                            </tr>
+                            <tr class="empty-row" th:if="${convidados == null or convidados.isEmpty()}">
+                                <td colspan="5">Nenhum convidado adicionado ainda.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+</body>
+</html>

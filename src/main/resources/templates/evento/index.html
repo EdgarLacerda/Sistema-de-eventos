@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>EventoApp</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --teal: #0f9e8a;
+            --teal-light: #e6f7f5;
+            --teal-dark: #0a6e60;
+            --ink: #1a1a1a;
+            --ink-soft: #555;
+            --ink-muted: #999;
+            --border: #e8e8e8;
+            --surface: #fafafa;
+            --white: #ffffff;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--surface);
+            color: var(--ink);
+            min-height: 100vh;
+        }
+
+        /* TOP BAR */
+        .topbar {
+            background: var(--white);
+            border-bottom: 1px solid var(--border);
+            padding: 0 2rem;
+            height: 56px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .topbar-logo {
+            font-family: 'DM Serif Display', serif;
+            font-size: 20px;
+            color: var(--teal);
+            text-decoration: none;
+            letter-spacing: -0.5px;
+        }
+        .btn-new {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            font-weight: 500;
+            color: white;
+            text-decoration: none;
+            padding: 7px 16px;
+            background: var(--teal);
+            border-radius: 8px;
+            transition: background 0.15s;
+        }
+        .btn-new:hover { background: var(--teal-dark); }
+        .btn-new svg { width: 15px; height: 15px; }
+
+        /* LAYOUT */
+        .page {
+            max-width: 860px;
+            margin: 0 auto;
+            padding: 2.5rem 1.5rem 4rem;
+        }
+
+        /* PAGE HEADER */
+        .page-header {
+            margin-bottom: 1.5rem;
+        }
+        .page-title {
+            font-family: 'DM Serif Display', serif;
+            font-size: 2rem;
+            color: var(--ink);
+            letter-spacing: -0.5px;
+            margin-bottom: 4px;
+        }
+        .page-subtitle {
+            font-size: 14px;
+            color: var(--ink-muted);
+        }
+
+        /* CARD */
+        .card {
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            overflow: hidden;
+        }
+        .card-header {
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .card-title {
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--ink-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+        .count-badge {
+            background: var(--teal-light);
+            color: var(--teal-dark);
+            font-size: 11px;
+            font-weight: 500;
+            padding: 3px 10px;
+            border-radius: 99px;
+        }
+
+        /* TABLE */
+        .table-wrap { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; }
+        thead th {
+            padding: 10px 16px;
+            font-size: 11px;
+            font-weight: 500;
+            color: var(--ink-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.07em;
+            text-align: left;
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+        }
+        tbody tr {
+            border-bottom: 1px solid var(--border);
+            transition: background 0.1s;
+            cursor: pointer;
+        }
+        tbody tr:last-child { border-bottom: none; }
+        tbody tr:hover { background: var(--teal-light); }
+        tbody td { padding: 14px 16px; font-size: 14px; vertical-align: middle; }
+
+        .event-name-link {
+            font-weight: 500;
+            color: var(--teal-dark);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .event-name-link:hover { text-decoration: underline; }
+
+        .event-icon {
+            width: 34px;
+            height: 34px;
+            border-radius: 8px;
+            background: var(--teal-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        .event-icon svg { width: 16px; height: 16px; fill: var(--teal); }
+
+        .td-muted { color: var(--ink-soft); font-size: 13px; }
+        .td-mono { font-family: monospace; font-size: 13px; color: var(--ink-soft); }
+
+        .empty-row td {
+            padding: 3rem;
+            text-align: center;
+            color: var(--ink-muted);
+            font-size: 14px;
+        }
+
+        .arrow-icon {
+            color: var(--ink-muted);
+            font-size: 13px;
+            text-align: right;
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="topbar">
+        <a href="/eventos" class="topbar-logo">EventoApp</a>
+        <a href="/cadastrarEvento" class="btn-new">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 5v14M5 12h14"/>
+            </svg>
+            Novo evento
+        </a>
+    </nav>
+
+    <main class="page">
+
+        <div class="page-header">
+            <h1 class="page-title">Eventos</h1>
+            <p class="page-subtitle">Clique em um evento para ver os detalhes e gerenciar convidados.</p>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <span class="card-title">Todos os eventos</span>
+                <span class="count-badge" th:text="${#lists.size(eventos)} + ' evento(s)'">0 evento(s)</span>
+            </div>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Nome</th>
+                            <th>Local</th>
+                            <th>Data</th>
+                            <th>Horário</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="evento : ${eventos}"
+                            th:onclick="|window.location='/' + ${evento.codigo}|">
+                            <td>
+                                <a class="event-name-link"
+                                   th:href="@{/{codigo}(codigo=${evento.codigo})}">
+                                    <div class="event-icon">
+                                        <svg viewBox="0 0 24 24"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/></svg>
+                                    </div>
+                                    <span th:text="${evento.nome}">Nome do Evento</span>
+                                </a>
+                            </td>
+                            <td class="td-muted" th:text="${evento.local}">Local</td>
+                            <td class="td-mono" th:text="${evento.data}">00/00/0000</td>
+                            <td class="td-mono" th:text="${evento.horario}">00:00</td>
+                            <td class="arrow-icon">→</td>
+                        </tr>
+                        <tr class="empty-row" th:if="${#lists.isEmpty(eventos)}">
+                            <td colspan="5">Nenhum evento cadastrado ainda.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </main>
+
+</body>
+</html>
